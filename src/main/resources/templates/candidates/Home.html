@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        /* Remove the navbar's default margin-bottom and rounded borders */
+        .navbar {
+            margin-bottom: 0;
+            border-radius: 0;
+        }
+
+        /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+        .row.content {height: 450px}
+
+        /* Set gray background color and 100% height */
+        .sidenav {
+            padding-top: 20px;
+            background-color: #f1f1f1;
+            height: 100%;
+        }
+
+        /* Set black background color, white text and some padding */
+        footer {
+            background-color: #555;
+            color: white;
+            padding: 15px;
+        }
+
+        /* On small screens, set height to 'auto' for sidenav and grid */
+        @media screen and (max-width: 767px) {
+            .sidenav {
+                height: auto;
+                padding: 15px;
+            }
+            .row.content {height:auto;}
+        }
+        .alert {
+            padding: 20px;
+            background-color: #f44336;
+            color: white;
+            opacity: 1;
+            transition: opacity 0.6s;
+            margin-bottom: 15px;
+        }
+
+        .alert.success {background-color: #04AA6D;}
+        .alert.info {background-color: #2196F3;}
+        .alert.warning {background-color: #ff9800;}
+
+        .closebtn {
+            margin-left: 15px;
+            color: white;
+            font-weight: bold;
+            float: right;
+            font-size: 22px;
+            line-height: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .closebtn:hover {
+            color: black;
+        }
+        table {
+            border-collapse: collapse;
+            border: 2px solid rgb(140 140 140);
+            font-family: sans-serif;
+            font-size: 16px;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        caption {
+            caption-side: top;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        thead,
+        tfoot {
+            background-color: rgb(228 240 245);
+        }
+
+        th,
+        td {
+            border: 1px solid rgb(160 160 160);
+            padding: 8px 10px;
+        }
+
+        td:last-of-type {
+            text-align: center;
+        }
+
+        tbody > tr:nth-of-type(even) {
+            background-color: rgb(237 238 242);
+        }
+
+        tfoot th {
+            text-align: right;
+        }
+
+        tfoot td {
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Logo</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/candidate">Profile</a></li>
+                <li><a href="/candidate/find-job">Find Job</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid text-center">
+    <div class="row content">
+        <div class="col-sm-2 sidenav">
+            <div style="display: flex; justify-content: center; flex-direction: column">
+                <div style="display: flex; justify-content: center; flex-direction: column">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#addSkillModal">Add Skill</button>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#addCandidateSkill" style="margin-top: 10px">Add Candidate Skill</button>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#addExperienceModal" style="margin-top: 10px">Add Experience</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-8 text-left" style="margin-top: 30px">
+            <div class="alert info" th:if="${message}">
+                <span class="closebtn">&times;</span>
+                <strong>Info!</strong> <p th:text="${message}"></p>
+            </div>
+            <div class="alert warning" th:if="${error}">
+                <span class="closebtn">&times;</span>
+                <strong>Warning!</strong> <p th:text="${error}"></p>
+            </div>
+
+            <div  th:if="${candidate}" style="display: flex">
+                <div style="width: 100px">User Name</div>:
+                <p th:text="${candidate.fullName}"></p>
+            </div>
+            <div  th:if="${candidate}" style="display: flex">
+                <div style="width: 100px">Email</div>:
+                <p th:text="${candidate.email}"></p>
+            </div>
+            <div  th:if="${candidate}" style="display: flex">
+                <div style="width: 100px">Phone Number</div>:
+                <p th:text="${candidate.phone}"></p>
+            </div>
+            <div style="margin-top: 30px">
+                <table>
+                    <caption>Skill For You</caption>
+                    <tr>
+                        <th>Skill Name</th>
+                        <th>Skill Description</th>
+                        <th>Skill Type</th>
+                        <th>Skill level</th>
+                        <th>More Information</th>
+                    </tr>
+                    <tr th:each="skill: ${skills}">
+                        <td th:text="${skill.getSkill().getSkillName()}"></td>
+                        <td th:text="${skill.getSkill().getSkillDescription()}"></td>
+                        <td th:text="${skill.getSkill().getType()}"></td>
+                        <td th:text="${skill.getSkillLevel()}"></td>
+                        <td th:text="${skill.getMoreInfos()}"></td>
+
+                    </tr>
+                </table>
+            </div>
+            <div style="margin-top: 30px">
+                <table>
+                    <caption>Experience For You</caption>
+                    <tr>
+                        <th>Company Name</th>
+                        <th>Role</th>
+                        <th>From Date</th>
+                        <th>To Date</th>
+                        <th>Word Description</th>
+                    </tr>
+                    <tr th:each="experience: ${experiences}">
+                        <td th:text="${experience.getCompanyName()}"></td>
+                        <td th:text="${experience.getRole()}"></td>
+                        <td th:text="${experience.getFromDate()}"></td>
+                        <td th:text="${experience.getToDate()}"></td>
+                        <td th:text="${experience.getWorkDescription()}"></td>
+
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Modal for Adding Skill -->
+<div id="addSkillModal" class="modal fade" role="dialog" aria-hidden="true" tabindex="-1" aria-labelledby="addSkillModalLabel" >
+    <div class="modal-dialog"  role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Skill</h4>
+            </div>
+            <form action="/skills/add" method="post">
+
+                <div class="modal-body">
+                    <!-- Skill Name -->
+
+                    <div class="form-group">
+                        <label>Skill Name:</label>
+                        <input type="text" class="form-control"  name="skillName" required>
+                    </div>
+                    <!-- Skill Description -->
+                    <div class="form-group">
+                        <label>Skill Description:</label>
+                        <textarea class="form-control" name="skillDescription" rows="3"></textarea>
+                    </div>
+                    <!-- Skill Type -->
+                    <div class="form-group">
+                        <label for="type">Skill Type:</label>
+                        <select class="form-control" id="type" name="type" required>
+                            <option value="SOFT_SKILL">Soft Skill</option>
+                            <option value="TECHNICAL_SKILL">Technical Skill</option>
+                            <option value="UNSPECIFIC">Unspecified</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save Skill</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Adding Experience -->
+<div id="addExperienceModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/candidate/add-experience" method="post">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Add Experience</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="companyName">Company Name:</label>
+                        <input type="text" class="form-control" id="companyName" name="companyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role:</label>
+                        <input type="text" class="form-control" id="role" name="role" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fromDate">From Date:</label>
+                        <input type="date" class="form-control" id="fromDate" name="fromDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="toDate">To Date:</label>
+                        <input type="date" class="form-control" id="toDate" name="toDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="workDescription">Work Description:</label>
+                        <textarea class="form-control" id="workDescription" name="workDescription"></textarea>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save Experience</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Adding Candidate Skill -->
+<div id="addCandidateSkill" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/candidate/add-skill" method="post">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Add Skill</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- Skill Name -->
+                    <div class="row form-group">
+                        <div class="col-md-12" style="display: flex" >
+                            <input placeholder="search skill" class="col-md-6" style="height: 35px; border-radius: 5px; " onchange="handleChangeTextSkill(event, 'modalCandidateSkillName','modalCandidateSkillDescription','modalCandidateSkillType')"/>
+                            <select id="modalCandidateSkillName"  name="candidateSkillId" class="form-control col-md-6"  required onchange="handleShowSkillDescription(event,'modalCandidateSkillDescription','modalCandidateSkillType')">
+                                <!-- Options dynamically generated -->
+                            </select>
+
+                        </div>
+
+                    </div>
+                        <textarea id="modalCandidateSkillDescription" class="form-control col-md-12" rows="2" disabled></textarea>
+                    <!-- Skill Type -->
+                    <div class="form-group" style="margin-top: 10px">
+                        <label style="margin-top: 10px">Skill Type:</label>
+                        <select class="form-control" disabled>
+                            <option value="SOFT_SKILL">Soft Skill</option>
+                            <option value="TECHNICAL_SKILL">Technical Skill</option>
+                            <option value="UNSPECIFIC">Unspecified</option>
+                        </select>
+                    </div>
+                    <!-- Skill Level -->
+                    <div class="form-group">
+                        <label for="skillLevel">Skill Level:</label>
+                        <select class="form-control" id="skillLevel" name="skillLevel" required>
+                            <option value="BEGINER">Beginner</option>
+                            <option value="IMTERMEDIATE">Intermediate</option>
+                            <option value="ADVANCED">Advanced</option>
+                            <option value="PROFESSIONAL">Professional</option>
+                            <option value="MASTER">Master</option>
+                        </select>
+                    </div>
+                    <!-- More Information -->
+                    <div class="form-group">
+                        <label for="moreInfo">More Information:</label>
+                        <textarea class="form-control" id="moreInfo" name="moreInfo" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save Skill</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    var close = document.getElementsByClassName("closebtn");
+    var i;
+
+    for (i = 0; i < close.length; i++) {
+        close[i].onclick = function(){
+            var div = this.parentElement;
+            div.style.opacity = "0";
+            setTimeout(function(){ div.style.display = "none"; }, 600);
+        }
+    }
+    // JavaScript to dynamically add skill rows
+    document.querySelector('.add-skill-btn').addEventListener('click', function () {
+        const container = document.getElementById('jobSkillsContainer');
+        const row = document.createElement('div');
+        const index = container.children.length
+        row.classList.add('row', 'mb-2');
+        row.innerHTML = `
+               <div class="col-md-6" style="display: flex" >
+                   <input placeholder="search skill" class="col-md-6" style="height: 35px; border-radius: 5px; " onchange="handleChangeTextSkill(event, 'select-skill-${index}','skillDescription${index}')"/>
+                   <select id="select-skill-${index}" class="form-control col-md-6" name="skills[${index}].id" required onchange="handleShowSkillDescription(event,'skillDescription${index}')">
+                       <!-- Options dynamically generated -->
+                   </select>
+
+               </div>
+            <div class="col-md-4" style="margin-top: 10px">
+                <select class="form-control" name="skills[${index}].skillLevel" required>
+                    <option value="">Select Skill Level</option>
+                    <option value="MASTER">Master</option>
+                    <option value="BEGINER">Beginner</option>
+                    <option value="ADVANCED">Advanced</option>
+                    <option value="PROFESSIONAL">Professional</option>
+                    <option value="IMTERMEDIATE">Intermediate</option>
+                </select>
+            </div>
+            <div class="col-md-2" style="margin-top: 10px">
+                <button type="button" class="btn btn-danger btn-sm remove-skill-btn">-</button>
+            </div>
+        `;
+
+
+        const rowDivMoreInfo = document.createElement('div');
+        rowDivMoreInfo.classList.add('row', 'mb-2', 'col-md-12');
+        rowDivMoreInfo.style.marginTop = "10px";
+        rowDivMoreInfo.style.marginBottom = "10px";
+
+        const textArea = document.createElement('textarea');
+        textArea.classList.add('form-control', 'col-md-12');
+        textArea.id = 'moreInfos';
+        textArea.name = `skills[${index}].moreInfos`;
+        textArea.rows = 2;
+        textArea.placeholder = "Enter skill more info";
+        textArea.required = true;
+
+        rowDivMoreInfo.appendChild(textArea);
+
+        const div = document.createElement("div")
+        div.appendChild(row)
+        div.appendChild(createSkillDescriptionRow(index))
+        div.appendChild(rowDivMoreInfo)
+        container.appendChild(div);
+
+        // Remove skill row
+        row.querySelector('.remove-skill-btn').addEventListener('click', function () {
+            row.remove();
+        });
+    });
+    function createSkillDescriptionRow(index) {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('row', 'mb-2', 'col-md-12');
+        rowDiv.style.marginTop = "10px";
+        rowDiv.style.marginBottom = "10px";
+
+        const textArea = document.createElement('textarea');
+        textArea.id = `skillDescription${index}`;
+        textArea.classList.add('form-control', 'col-md-12');
+        textArea.rows = 2;
+        textArea.disabled = true; // Đặt textarea là disabled
+        rowDiv.appendChild(textArea);
+
+        return rowDiv;
+    }
+    async function fetchSkills(name){
+        try {
+            const response  = await fetch('http://localhost:8080/api/skills?name='+name);
+            if(!response.ok){
+                return[];
+            }
+            const data = await response.json();
+            return data;
+        }catch (e){
+            return []
+        }
+    }
+    async function handleChangeTextSkill(event, idSelect, idArea,elementIdSkillType){
+        const elementSelect = document.getElementById(idSelect)
+        const elementArea = document.getElementById(idArea)
+        if (elementSelect != null){
+            // elementSelect.blur()
+            elementSelect.innerHTML = "";
+            const textSearch = event.target.value;
+            const data = await fetchSkills(textSearch)
+            data.skills.forEach((skill,index)=>{
+                if(index===0){
+                    elementArea.value = skill.skillDescription
+                    if(elementIdSkillType!=null){
+                        const elementSelectSkillType = document.getElementById(elementIdSkillType);
+                        if(elementSelectSkillType!= null){
+                            elementSelectSkillType.value =skill.type
+                        }
+                    }
+                }
+
+                const elementSkill = document.createElement("option")
+                elementSkill.text = skill.skillName;
+                elementSkill.value = skill.id;
+                elementSkill.dataset.description = skill.skillDescription;
+                elementSkill.dataset.skillType = skill.type;
+                elementSelect.appendChild(elementSkill)
+            })
+            elementSelect.focus()
+        }
+    }
+    function handleShowSkillDescription(event,elementIdShowDescription, elementIdSkillType){
+        const elementShowSkillDescription = document.getElementById(elementIdShowDescription)
+        const selectedOption = event.target.options[event.target.selectedIndex];
+        if(elementShowSkillDescription != null){
+            elementShowSkillDescription.value = selectedOption.dataset.description;
+        }
+        if(elementIdSkillType!=null){
+            const elementSelectSkillType = document.getElementById(elementIdSkillType);
+            if(elementSelectSkillType!= null){
+                elementSelectSkillType.value =selectedOption.dataset.skillType
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
