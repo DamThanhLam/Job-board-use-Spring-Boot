@@ -3,6 +3,7 @@ package vn.edu.iuh.fit.backend.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import vn.edu.iuh.fit.backend.enums.StatusPostJob;
 
 import java.util.List;
 
@@ -25,6 +26,9 @@ public class Job {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company")
     private Company company;
+
+    @Column(name = "status", nullable = false)
+    private StatusPostJob status;
 
     @OneToMany(mappedBy = "job", fetch = FetchType.EAGER)
     private List<JobSkill> jobSkills;

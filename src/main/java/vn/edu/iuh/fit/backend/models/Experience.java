@@ -1,5 +1,6 @@
 package vn.edu.iuh.fit.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,8 +28,9 @@ public class Experience {
     private String workDescription;
 
     //=============================RELATIONSHIPS====================
-    @ManyToOne(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "can_id")
+    @JsonIgnore
     private Candidate candidate;
 
     public Experience(String companyName, LocalDate fromDate, LocalDate toDate, String role, String workDescription) {

@@ -25,4 +25,7 @@ public class ExperienceService {
         }
         return false;
     }
+    public List<Experience> findByCandidateId(Long id) {
+        return experienceRepository.findByCandidate_Id(id);
+    }
 }

@@ -48,5 +48,4 @@ public class CandidateService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         return candidateRepository.findCandidatesByJobIdAndSkills(jobId,pageable);
     }
-
 }

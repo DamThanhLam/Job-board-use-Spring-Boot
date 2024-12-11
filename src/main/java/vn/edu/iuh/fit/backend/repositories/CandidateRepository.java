@@ -24,7 +24,7 @@ public interface CandidateRepository
             "JOIN js.job j " +
             "WHERE j.id = :jobId")
     List<Candidate> findCandidatesByJobIdAndSkills(@Param("jobId") Long jobId);
-    @Query("SELECT c FROM Candidate c " +
+    @Query("SELECT DISTINCT c FROM Candidate c " +
             "JOIN c.candidateSkills cs " +
             "JOIN cs.skill s " +
             "JOIN JobSkill js ON js.skill = s " +
