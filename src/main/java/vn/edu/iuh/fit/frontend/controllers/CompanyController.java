@@ -1,10 +1,12 @@
 package vn.edu.iuh.fit.frontend.controllers;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -16,10 +18,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import vn.edu.iuh.fit.backend.enums.SkillLevel;
+import vn.edu.iuh.fit.backend.enums.StatusPostJob;
 import vn.edu.iuh.fit.backend.ids.JobSkillId;
 import vn.edu.iuh.fit.backend.models.*;
 import vn.edu.iuh.fit.backend.services.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,13 +38,15 @@ public class CompanyController {
     private final SkillService skillService;
     private final JobSkillService jobSkillService;
     private final CandidateService candidateService;
+    private final ExperienceService experienceService;
 
-    public CompanyController(CompanyService companyService, JobService jobService, SkillService skillService, JobSkillService jobSkillService, CandidateService candidateService) {
+    public CompanyController(CompanyService companyService, JobService jobService, SkillService skillService, JobSkillService jobSkillService, CandidateService candidateService, ExperienceService experienceService) {
         this.companyService = companyService;
         this.jobService = jobService;
         this.skillService = skillService;
         this.jobSkillService = jobSkillService;
         this.candidateService = candidateService;
+        this.experienceService = experienceService;
     }
 
     @GetMapping
@@ -58,7 +64,17 @@ public class CompanyController {
         model.addAttribute("jobs", jobs);
         return "company/Home";
     }
+    @GetMapping
+    @RequestMapping("/get-experiences")
+    public ResponseEntity<?> getExperiences(@RequestParam("candidateId") Long candidateId){
+        List<Experience> experiences = experienceService.findByCandidateId(candidateId);
+        System.out.println(experiences.size());
+        if(experiences.isEmpty()){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(experiences);
 
+    }
     @PostMapping
     @RequestMapping("/add-job")
     @Transactional
@@ -128,6 +144,12 @@ public class CompanyController {
         List<Candidate> candidates = candidateService.findCandidatesByJobIdAndSkills(jobId);
         model.addAttribute("candidates", candidates);
         return "company/FindCandidates";
+    }
+    @GetMapping
+    @RequestMapping("/status-job")
+    public void closeJob(@RequestParam("jobId")long jobId, @RequestParam("status")StatusPostJob status, HttpServletResponse response) throws IOException {
+        jobService.close(jobId,status);
+        response.sendRedirect("/company");
     }
     private record SkillRequest(
             @NotNull(message = "Skill ID cannot be null.")

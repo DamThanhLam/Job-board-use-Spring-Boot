@@ -1,5 +1,6 @@
 package vn.edu.iuh.fit.frontend.controllers;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -8,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import vn.edu.iuh.fit.backend.enums.SkillLevel;
 import vn.edu.iuh.fit.backend.enums.SkillType;
 import vn.edu.iuh.fit.backend.ids.CandidateSkillId;
@@ -22,6 +24,7 @@ import vn.edu.iuh.fit.backend.services.SkillService;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -151,6 +154,7 @@ public class CandidateController {
         model.addAttribute("skills", candidateSkillService.findByCanId(candidate.get().getId()));
         return "candidates/Home";
     }
+
     private record EntityRequestAddExperience(String companyName, String role, LocalDate fromDate, LocalDate toDate, String workDescription) {}
     private record EntityRequestAddSkill(long candidateSkillId, SkillLevel skillLevel, String moreInfo){}
 }

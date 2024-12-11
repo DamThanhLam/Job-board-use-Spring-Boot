@@ -187,9 +187,11 @@ public class SecurityConfig {
                     });
                 })
                 .oauth2Login(httpSecurityOAuth2LoginConfigurer ->
-                        httpSecurityOAuth2LoginConfigurer.successHandler((request, response, authentication) -> {
-                            System.out.println("Authentication successful 181");
-                        })
+                        httpSecurityOAuth2LoginConfigurer
+                                .successHandler((request, response, authentication) -> {
+                                    System.out.println("Authentication successful 181");
+                                })
+                                .defaultSuccessUrl("/",true)
                 )
                 .addFilterBefore(new RedirectIfLoggedInFilter(candidateService, companyService), UsernamePasswordAuthenticationFilter.class);
 //
