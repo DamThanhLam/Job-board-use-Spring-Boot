@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Invitation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #4285f4;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+            color: #333333;
+        }
+        .content p {
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        .content .job-details {
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        .content .job-details h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #444444;
+        }
+        .content .job-details p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666666;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #888888;
+        }
+        .footer a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4285f4;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #3367d6;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <h1>{{companyName}} - Job Invitation</h1>
+    </div>
+    <div class="content">
+        <p>Dear Candidate,</p>
+        <p>We are excited to invite you to apply for the position of <strong>{{jobTitle}}</strong> at <strong>{{companyName}}</strong>. Below are the job details:</p>
+        <div class="job-details">
+            <h3>Job Details</h3>
+            <p><strong>Description:</strong> {{jobDescription}}</p>
+            <h3>Skills Required</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <thead>
+                <tr style="background-color: #f4f4f4;">
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Skill Name</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Description</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Type</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">More Infos</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{jobSkills}}
+                </tbody>
+            </table>
+        </div>
+        <p>If you are interested in this opportunity, please click the button below to apply:</p>
+        <p>We look forward to receiving your application!</p>
+    </div>
+    <div class="footer">
+        <p>This email was sent by {{companyName}}.</p>
+        <p>Need help? Contact Us(this reply email)</p>
+    </div>
+</div>
+</body>
+</html>

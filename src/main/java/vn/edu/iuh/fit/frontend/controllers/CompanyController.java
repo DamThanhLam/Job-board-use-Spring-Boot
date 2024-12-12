@@ -1,14 +1,23 @@
 package vn.edu.iuh.fit.frontend.controllers;
 
+import com.google.api.services.gmail.model.Message;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,10 +33,7 @@ import vn.edu.iuh.fit.backend.models.*;
 import vn.edu.iuh.fit.backend.services.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -39,14 +45,18 @@ public class CompanyController {
     private final JobSkillService jobSkillService;
     private final CandidateService candidateService;
     private final ExperienceService experienceService;
+    private final EmailService emailService;
+    @Autowired
+    private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
 
-    public CompanyController(CompanyService companyService, JobService jobService, SkillService skillService, JobSkillService jobSkillService, CandidateService candidateService, ExperienceService experienceService) {
+    public CompanyController(CompanyService companyService, JobService jobService, SkillService skillService, JobSkillService jobSkillService, CandidateService candidateService, ExperienceService experienceService, EmailService emailService) {
         this.companyService = companyService;
         this.jobService = jobService;
         this.skillService = skillService;
         this.jobSkillService = jobSkillService;
         this.candidateService = candidateService;
         this.experienceService = experienceService;
+        this.emailService = emailService;
     }
 
     @GetMapping
@@ -143,6 +153,7 @@ public class CompanyController {
     public String findCandidates(@RequestParam("jobId")long jobId, Model model) {
         List<Candidate> candidates = candidateService.findCandidatesByJobIdAndSkills(jobId);
         model.addAttribute("candidates", candidates);
+        model.addAttribute("jobId",jobId);
         return "company/FindCandidates";
     }
     @GetMapping
@@ -150,6 +161,37 @@ public class CompanyController {
     public void closeJob(@RequestParam("jobId")long jobId, @RequestParam("status")StatusPostJob status, HttpServletResponse response) throws IOException {
         jobService.close(jobId,status);
         response.sendRedirect("/company");
+    }
+    @GetMapping
+    @RequestMapping("/invite-candidate")
+    public ResponseEntity<?> inviteCandidate(@RequestParam("candidateId") Long candidateId,@RequestParam("jobId") Long jobId) throws IOException, MessagingException, javax.mail.MessagingException {
+        OAuth2User user = (OAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Candidate> candidate = candidateService.findById(candidateId);
+        Optional<Job> job = jobService.findById(jobId);
+//        OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+//        OAuth2AuthorizedClient authorizedClient =
+//                this.oAuth2AuthorizedClientService.loadAuthorizedClient(
+//                        authenticationToken.getAuthorizedClientRegistrationId(),
+//                        authenticationToken.getName());
+
+        if(candidate.isPresent()){
+            String htmlContent = emailService.getHtmlTemplateInviteCandidate("src/main/resources/templates/TemplatesEmail/InviteCandidate.html",job.get());
+            Message result = emailService.sendEmail(user.getAttribute("email"),candidate.get().getEmail(),htmlContent);
+            Map<String,Object> response = new HashMap<>();
+            if(result != null){
+                response.put("message", result);
+                response.put("status", "success");
+            }else{
+                response.put("status", "failed");
+            }
+            return ResponseEntity.ok(response);
+//            String accessToken = authorizedClient.getAccessToken().getTokenValue();
+
+
+        }
+        return ResponseEntity.badRequest().build();
+
+
     }
     private record SkillRequest(
             @NotNull(message = "Skill ID cannot be null.")
