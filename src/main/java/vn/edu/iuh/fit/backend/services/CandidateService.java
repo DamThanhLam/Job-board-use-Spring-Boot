@@ -48,4 +48,8 @@ public class CandidateService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         return candidateRepository.findCandidatesByJobIdAndSkills(jobId,pageable);
     }
+
+    public Optional<Candidate> findById(Long candidateId) {
+        return Optional.ofNullable(candidateRepository.findById(candidateId).orElse(null));
+    }
 }

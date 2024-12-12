@@ -7,6 +7,7 @@ import vn.edu.iuh.fit.backend.models.Job;
 import vn.edu.iuh.fit.backend.repositories.JobRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class JobService {
@@ -21,5 +22,9 @@ public class JobService {
 
     public void close(long jobId, StatusPostJob status) {
         jobRepository.updateStatusById(status,jobId);
+    }
+
+    public Optional<Job> findById(Long jobId) {
+        return jobRepository.findById(jobId);
     }
 }

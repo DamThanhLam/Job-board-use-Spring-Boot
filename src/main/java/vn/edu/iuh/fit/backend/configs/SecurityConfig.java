@@ -32,6 +32,7 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
@@ -61,6 +62,7 @@ import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
+
 public class SecurityConfig {
     private final CandidateService candidateService;
     private final CompanyService companyService;
@@ -70,27 +72,55 @@ public class SecurityConfig {
         this.companyService = companyService;
     }
 
+//    @Bean
+//    @ConditionalOnMissingBean(UserDetailsService.class)
+//    public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
+//        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//        String generatedPassword = passwordEncoder.encode("user");
+//        return new InMemoryUserDetailsManager(
+//                User.withUsername("user")
+//                        .password(generatedPassword)
+//                        .roles("USER")
+//                        .build());
+//    }
     @Bean
-    @ConditionalOnMissingBean(UserDetailsService.class)
-    public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String generatedPassword = passwordEncoder.encode("user");
-        return new InMemoryUserDetailsManager(
-                User.withUsername("user")
-                        .password(generatedPassword)
-                        .roles("USER")
-                        .build());
+    public ClientRegistration googleClientRegistration() {
+        return ClientRegistration.withRegistrationId("google")
+                .clientId("1016771915078-o8jme98lmp5t2pv1jo2rsc7e88776iqi.apps.googleusercontent.com")
+                .clientSecret("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")
+                .scope("profile", "email","https://www.googleapis.com/auth/gmail.send")
+                .authorizationUri("https://accounts.google.com/o/oauth2/auth")
+                .tokenUri("https://oauth2.googleapis.com/token")
+                .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri("{baseUrl}/login/oauth2/code/google")
+                .userNameAttributeName("sub")
+                .build();
     }
-    @Bean
-    public AuthenticationManager authenticationManager(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
 
-        return new ProviderManager(authenticationProvider);
+    @Bean
+    public OAuth2AuthorizedClientService authorizedClientService(
+            ClientRegistrationRepository clientRegistrationRepository) {
+        return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
     }
+    @Bean
+    public OAuth2AuthorizedClientRepository authorizedClientRepository(
+            OAuth2AuthorizedClientService authorizedClientService) {
+        return new AuthenticatedPrincipalOAuth2AuthorizedClientRepository(authorizedClientService);
+    }
+
+
+//    @Bean
+//    public AuthenticationManager authenticationManager(
+//            UserDetailsService userDetailsService,
+//            PasswordEncoder passwordEncoder) {
+//        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+//        authenticationProvider.setUserDetailsService(userDetailsService);
+//        authenticationProvider.setPasswordEncoder(passwordEncoder);
+//
+//        return new ProviderManager(authenticationProvider);
+//    }
 //
 //    /**
 //    * DefaultAuthenticationEventPublisher được sử dụng để phát các sự kiện như:
@@ -211,9 +241,9 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-//    @Bean
-//    public ClientRegistrationRepository clientRegistrationRepository() {
-//        return new InMemoryClientRegistrationRepository();
-//    }
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository() {
+        return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
+    }
 
 }

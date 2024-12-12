@@ -53,7 +53,8 @@ C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
                     <button class="btn btn-default" th:onclick="'handleSeeMoreExperiences(' + ${candidate.id} + ')'">See</button>
                 </td>
                 <td>
-                    <button class="btn btn-default" th:onclick="">Send to</button>
+                    <button class="btn btn-default" th:onclick="'handleInviteCandidate('+${candidate.id}+','+${jobId}+')'">Send to</button>
+
                 </td>
             </tr>
             </tbody>
@@ -64,7 +65,7 @@ C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
 </div>
 <script>
     async function fetchGetExperiences(candidateId) {
-        const response = await fetch('/company/get-experiences?candidateId=' + candidateId)
+        const response = await fetch(`/company/get-experiences?candidateId=${candidateId}`);
         if (!response.ok) {
             return [];
         }
@@ -128,6 +129,15 @@ C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
                 `
 
             }
+        }
+    }
+    async function handleInviteCandidate(candidateId,jobId){
+        const response = await fetch(`/company/invite-candidate?candidateId=${candidateId}&jobId=${jobId}`)
+        if(response.ok){
+            const data = await response.json()
+            alert(data.status)
+        }else{
+            alert("Invite fail.")
         }
     }
 

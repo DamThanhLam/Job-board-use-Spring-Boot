@@ -202,7 +202,7 @@
                             <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].skill.skillName}"></td>
                             <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].skill.skillDescription}"></td>
                             <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].skill.type}"></td>
-                            <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.getStatus().name()}"></td>
+                            <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].moreInfos}"></td>
                             <td th:if="${#lists.size(job.jobSkills) > 0}">
                                 <a th:if="${job.getStatus().name().equals('OPEN')}" th:href="@{/company/find-candidates(jobId=${job.id})}">Find</a>
                             </td>
