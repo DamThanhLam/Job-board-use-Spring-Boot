@@ -3,6 +3,7 @@ package vn.edu.iuh.fit.backend.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import vn.edu.iuh.fit.backend.enums.StatusPostJob;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public class Job {
     @Column(name = "status", nullable = false)
     private StatusPostJob status;
 
-    @OneToMany(mappedBy = "job", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY)
     private List<JobSkill> jobSkills;
 
 }

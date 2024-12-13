@@ -2,9 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Company</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-
+T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous">
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-
+C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+         th{
+            text-align: center;
+            border: solid 1px #666666 ;
+        }
+
+    </style>
 </head>
 <body>
-<h1>Find Job</h1>
+    <div style="width: 90%; margin-left: 5%">
+        <h2>Jobs</h2>
+        <a href="/">&#8678; Back</a>
+        <table class="table table-hover" style="border: solid 2px #666666 ">
+            <tr>
+                <th rowspan="2">Company</th>
+                <th rowspan="2">Jobs</th>
+                <th rowspan="1" colspan="4">Job Skill</th>
+                <th rowspan="2">improve your skills</th>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Level</th>
+                <th>More Infos</th>
+            </tr>
+            <tbody th:each="entry :${suggestions}">
+                <tr>
+                    <td th:rowspan="${#lists.size(entry.getKey().getJobSkills())+1}" th:text="${entry.getKey().getCompany().getName()}" style="vertical-align: middle"></td>
+                    <td th:rowspan="${#lists.size(entry.getKey().getJobSkills())+1}"  th:text="${entry.getKey().getJobName()}" style="vertical-align: middle"></td>
+                    <td rowspan="1" th:text="${entry.getKey().getJobSkills().get(0).getSkill().getSkillName()}"></td>
+                    <td rowspan="1" th:text="${entry.getKey().getJobSkills().get(0).getSkill().getSkillDescription()}"></td>
+                    <td rowspan="1" th:text="${entry.getKey().getJobSkills().get(0).getSkillLevel().name()}"></td>
+                    <td rowspan="1" th:text="${entry.getKey().getJobSkills().get(0).getMoreInfos()}"></td>
+                    <td th:rowspan="${#lists.size(entry.getKey().getJobSkills())+1}" th:text="${entry.getValue()}" style="vertical-align: middle"></td>
+                </tr>
+                <tr th:each="jobSkill, iterSart: ${entry.getKey().getJobSkills()}">
+                    <td th:if="${iterSart.index} > 0" th:text="${jobSkill.getSkill().getSkillName()}"></td>
+                    <td th:if="${iterSart.index} > 0" th:text="${jobSkill.getSkill().getSkillDescription()}"></td>
+                    <td th:if="${iterSart.index} > 0" th:text="${jobSkill.getSkillLevel().name()}"></td>
+                    <td th:if="${iterSart.index} > 0" th:text="${jobSkill.getMoreInfos()}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

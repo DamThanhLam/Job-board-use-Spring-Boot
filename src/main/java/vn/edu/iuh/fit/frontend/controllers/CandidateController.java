@@ -13,14 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import vn.edu.iuh.fit.backend.enums.SkillLevel;
 import vn.edu.iuh.fit.backend.enums.SkillType;
 import vn.edu.iuh.fit.backend.ids.CandidateSkillId;
-import vn.edu.iuh.fit.backend.models.Candidate;
-import vn.edu.iuh.fit.backend.models.CandidateSkill;
-import vn.edu.iuh.fit.backend.models.Experience;
-import vn.edu.iuh.fit.backend.models.Skill;
-import vn.edu.iuh.fit.backend.services.CandidateService;
-import vn.edu.iuh.fit.backend.services.CandidateSkillService;
-import vn.edu.iuh.fit.backend.services.ExperienceService;
-import vn.edu.iuh.fit.backend.services.SkillService;
+import vn.edu.iuh.fit.backend.models.*;
+import vn.edu.iuh.fit.backend.services.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -35,12 +29,14 @@ public class CandidateController {
     private final SkillService skillService;
     private final CandidateSkillService candidateSkillService;
     private final ExperienceService experienceService;
+    private final JobService jobService;
 
-    public CandidateController(CandidateService candidateService, SkillService skillService, CandidateSkillService candidateSkillService, ExperienceService experienceService) {
+    public CandidateController(CandidateService candidateService, SkillService skillService, CandidateSkillService candidateSkillService, ExperienceService experienceService, JobService jobService) {
         this.candidateService = candidateService;
         this.skillService = skillService;
         this.candidateSkillService = candidateSkillService;
         this.experienceService = experienceService;
+        this.jobService = jobService;
     }
 
     @GetMapping
@@ -49,6 +45,35 @@ public class CandidateController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         OAuth2User user = (OAuth2User) authentication.getPrincipal();
         Optional<Candidate> candidate = candidateService.findByEmail(user.getAttribute("email"));
+        List<Job> jobs = jobService.suggestJob(candidate.get().getId());
+        List<CandidateSkill> candidateSkills = candidateSkillService.findByCanId(candidate.get().getId());
+        Map<Job, String> suggestions = new HashMap<>();
+        for (Job job : jobs) {
+            List<JobSkill> jobSkills = job.getJobSkills();
+            String suggest = "Suggest: ";
+            for (JobSkill jobSkill : jobSkills) {
+                boolean exists = false;
+                for (CandidateSkill candidateSkill : candidateSkills) {
+                    if(candidateSkill.getSkill() == jobSkill.getSkill()) {
+                        exists = true;
+                        System.out.println("jobSkill.getSkillLevel().getLevel(): "+jobSkill.getSkillLevel());
+                        System.out.println("jobSkill.getSkillLevel().getLevel(): "+jobSkill.getSkillLevel().getLevel());
+                        System.out.println("candidateSkill.getSkillLevel().getLevel(): "+candidateSkill.getSkillLevel());
+                        System.out.println("candidateSkill.getSkillLevel().getLevel(): "+candidateSkill.getSkillLevel().getLevel());
+                        if(candidateSkill.getSkillLevel() != SkillLevel.MASTER
+                        && candidateSkill.getSkillLevel().getLevel() < jobSkill.getSkillLevel().getLevel()) {
+                            suggest += "\n You should be improve skill " + candidateSkill.getSkill().getSkillName()+ " to level "+ jobSkill.getSkillLevel();
+                        }
+                        break;
+                    }
+                }
+                if(!exists) {
+                    suggest +="\n You should be learn new skill " + jobSkill.getSkill().getSkillName()+ " to level "+ jobSkill.getSkillLevel();
+                }
+                suggestions.put(job, suggest);
+            }
+        }
+        model.addAttribute("suggestions", suggestions);
         return "candidates/FindJob";
     }
     @GetMapping

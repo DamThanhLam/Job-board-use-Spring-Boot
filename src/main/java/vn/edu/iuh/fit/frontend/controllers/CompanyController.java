@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.edu.iuh.fit.backend.enums.SkillLevel;
 import vn.edu.iuh.fit.backend.enums.StatusPostJob;
 import vn.edu.iuh.fit.backend.ids.JobSkillId;
@@ -60,7 +61,7 @@ public class CompanyController {
     }
 
     @GetMapping
-    public String company(Model model) {
+    public String company(Model model, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         OAuth2User user = (OAuth2User) authentication.getPrincipal();
         Optional<Company> company = companyService.findByEmail(user.getAttribute("email"));
@@ -88,18 +89,16 @@ public class CompanyController {
     @PostMapping
     @RequestMapping("/add-job")
     @Transactional
-    public String addJob(@Valid JobRequest jobRequest, Model model, BindingResult bindingResult) {
+    public String addJob(@Valid JobRequest jobRequest, Model model, BindingResult bindingResult, RedirectAttributes redirectAttributes) throws IOException {
         // Kiểm tra dữ liệu nhận được
-        System.out.println("Job Name: " + jobRequest.jobName);
-        System.out.println("Job Description: " + jobRequest.jobDescription);
         jobRequest.skills.forEach(skill -> {
             System.out.println("Skill ID: " + skill.id);
             System.out.println("Skill Level: " + skill.skillLevel);
             System.out.println("More Infos: " + skill.moreInfos);
         });
         if (bindingResult.hasErrors()) {
-            model.addAttribute("errors", bindingResult.getAllErrors());
-            return "company/Home";
+            redirectAttributes.addFlashAttribute("error", bindingResult.getAllErrors().toString());
+            return "redirect:/company";
         }
 
         // Lấy thông tin công ty dựa trên email người dùng
@@ -108,8 +107,8 @@ public class CompanyController {
         Optional<Company> companyOptional = companyService.findByEmail(user.getAttribute("email"));
 
         if (companyOptional.isEmpty()) {
-            model.addAttribute("error", "Company not found for the authenticated user.");
-            return "company/Home";
+            redirectAttributes.addFlashAttribute("error", "Company not found for the authenticated user.");
+            return "redirect:/company";
         }
 
         // Tạo Job mới
@@ -118,13 +117,12 @@ public class CompanyController {
         job.setCompany(company);
         job.setJobDesc(jobRequest.jobDescription);
         job.setJobName(jobRequest.jobName);
+        job.setStatus(StatusPostJob.OPEN);
         // Lưu Job vào database
         Job jobResult = jobService.save(job);
         // Kiểm tra và xử lý các SkillRequest
-        System.out.println("Skill ID 105: " + jobRequest.skills.size());
         jobRequest.skills.stream()
                 .map(skillRequest -> {
-                    System.out.println("Skill ID 105: " + skillRequest.id());
                     Optional<Skill> skillOptional = skillService.findById(skillRequest.id());
                     if (skillOptional.isPresent()) {
                         JobSkill jobSkill = new JobSkill();
@@ -144,8 +142,8 @@ public class CompanyController {
                     }
                 }).forEach(savedJobSkill -> System.out.println("Saved JobSkill: " + savedJobSkill));;
 
-        model.addAttribute("message", "Job added successfully!");
-        return "company/Home";
+        redirectAttributes.addFlashAttribute("message", "Job added successfully!");
+        return "redirect:/company";
     }
 
     @GetMapping

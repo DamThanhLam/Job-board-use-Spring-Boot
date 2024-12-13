@@ -27,4 +27,8 @@ public class JobService {
     public Optional<Job> findById(Long jobId) {
         return jobRepository.findById(jobId);
     }
+
+    public List<Job> suggestJob(Long candidateId) {
+        return jobRepository.suggestJobByCandidateId(candidateId);
+    }
 }
