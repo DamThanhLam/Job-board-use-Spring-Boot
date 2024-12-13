@@ -6,7 +6,13 @@ public enum SkillLevel {
     ADVANCED(3),
     PROFESSIONAL(4),
     IMTERMEDIATE(5);
-    SkillLevel(int level) {
+    private int level;
 
+    SkillLevel(int i) {
+        level = i;
+    }
+
+    public int getLevel() {
+        return level;
     }
 }

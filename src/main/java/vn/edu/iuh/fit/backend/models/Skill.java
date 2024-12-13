@@ -30,6 +30,8 @@ public class Skill {
     @OneToMany(mappedBy = "skill")
     private List<JobSkill> jobSkills;
 
+
+
     public Skill(String skillDescription, String skillName, SkillType type) {
         this.skillDescription = skillDescription;
         this.skillName = skillName;

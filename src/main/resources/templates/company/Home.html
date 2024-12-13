@@ -187,7 +187,7 @@
                     <tr>
                         <th>Skill name</th>
                         <th>Description</th>
-                        <th>Type</th>
+                        <th>Level</th>
                         <th>More Infos</th>
                     </tr>
                     </thead>
@@ -195,21 +195,21 @@
                     <tbody th:each="job : ${jobs}">
                         <tr >
                             <!-- Hiển thị thông tin công việc -->
-                            <td th:rowspan="${#lists.size(job.jobSkills) > 0 ? job.jobSkills.size() : 1}" th:text="${job.getJobName()}"></td>
-                            <td th:rowspan="${#lists.size(job.jobSkills) > 0 ? job.jobSkills.size() : 1}" th:text="${job.getJobDesc()}"></td>
+                            <td th:rowspan="${#lists.size(job.jobSkills) +1}" th:text="${job.getJobName()}"></td>
+                            <td th:rowspan="${#lists.size(job.jobSkills) +1}" th:text="${job.getJobDesc()}"></td>
 
                             <!-- Hiển thị thông tin kỹ năng đầu tiên nếu có -->
                             <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].skill.skillName}"></td>
                             <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].skill.skillDescription}"></td>
-                            <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].skill.type}"></td>
+                            <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].getSkillLevel()}"></td>
                             <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].moreInfos}"></td>
-                            <td th:if="${#lists.size(job.jobSkills) > 0}">
+                            <td th:rowspan="${#lists.size(job.jobSkills) +1}" th:if="${#lists.size(job.jobSkills) > 0}">
                                 <a th:if="${job.getStatus().name().equals('OPEN')}" th:href="@{/company/find-candidates(jobId=${job.id})}">Find</a>
                             </td>
-                            <td th:if="${#lists.size(job.jobSkills) > 0 && job.getStatus()!= null && job.getStatus().name().equals('OPEN')}">
+                            <td th:rowspan="${#lists.size(job.jobSkills) +1}" th:if="${#lists.size(job.jobSkills) > 0 && job.getStatus()!= null && job.getStatus().name().equals('OPEN')}">
                                 <a th:href="@{/company/status-job(jobId=${job.id},status='CLOSE')}">Close</a>
                             </td>
-                            <td th:if="${ #lists.size(job.jobSkills) > 0 && job.getStatus()!= null && job.getStatus().name().equals('CLOSE')}">
+                            <td th:rowspan="${#lists.size(job.jobSkills) +1}" th:if="${ #lists.size(job.jobSkills) > 0 && job.getStatus()!= null && job.getStatus().name().equals('CLOSE')}">
                                 <a th:href="@{/company/status-job(jobId=${job.id},status='OPEN')}">Open</a>
                             </td>
 
@@ -219,8 +219,6 @@
 
                         <!-- Hiển thị các kỹ năng còn lại (nếu có) -->
                         <tr th:each="skill, iterStat : ${job.jobSkills}">
-                            <td th:if="${iterStat.index > 0}" ></td>
-                            <td th:if="${iterStat.index > 0}" ></td>
                             <td th:if="${iterStat.index > 0}" th:text="${skill.skill.skillName}"></td>
                             <td th:if="${iterStat.index > 0}" th:text="${skill.skill.skillDescription}"></td>
                             <td th:if="${iterStat.index > 0}" th:text="${skill.skill.type}"></td>
