@@ -204,7 +204,7 @@
                             <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].getSkillLevel()}"></td>
                             <td th:if="${#lists.size(job.jobSkills) > 0}" th:text="${job.jobSkills[0].moreInfos}"></td>
                             <td th:rowspan="${#lists.size(job.jobSkills) +1}" th:if="${#lists.size(job.jobSkills) > 0}">
-                                <a th:if="${job.getStatus().name().equals('OPEN')}" th:href="@{/company/find-candidates(jobId=${job.id})}">Find</a>
+                                <a th:if="${job.getStatus().name().equals('OPEN')}" th:href="@{/company/find-candidates/page(jobId=${job.id})}">Find</a>
                             </td>
                             <td th:rowspan="${#lists.size(job.jobSkills) +1}" th:if="${#lists.size(job.jobSkills) > 0 && job.getStatus()!= null && job.getStatus().name().equals('OPEN')}">
                                 <a th:href="@{/company/status-job(jobId=${job.id},status='CLOSE')}">Close</a>
@@ -221,7 +221,7 @@
                         <tr th:each="skill, iterStat : ${job.jobSkills}">
                             <td th:if="${iterStat.index > 0}" th:text="${skill.skill.skillName}"></td>
                             <td th:if="${iterStat.index > 0}" th:text="${skill.skill.skillDescription}"></td>
-                            <td th:if="${iterStat.index > 0}" th:text="${skill.skill.type}"></td>
+                            <td th:if="${iterStat.index > 0}" th:text="${skill.getSkillLevel().name()}"></td>
                             <td th:if="${iterStat.index > 0}" th:text="${skill.moreInfos}"></td>
                         </tr>
                     </tbody>
@@ -370,7 +370,7 @@
         row.classList.add('row', 'mb-2');
         row.innerHTML = `
               <div class="col-md-6" style="display: flex; margin-top: 10px" >
-                <input placeholder="search skill" class="col-md-6" style="height: 35px; border-radius: 5px; " onchange="handleChangeTextSkill(event, 'select-skill-${index}'),''"/>
+                <input placeholder="search skill" class="col-md-6" style="height: 35px; border-radius: 5px; " onchange="handleChangeTextSkill(event, 'select-skill-${index}','skillDescription${index}')"/>
                 <select id="select-skill-${index}" class="form-control col-md-6" name="skills[${index}].id" required onchange="handleShowSkillDescription(event,'skillDescription${index}')">
                 <!-- Options dynamically generated -->
                 </select>
@@ -435,7 +435,7 @@
     }
     async function fetchSkills(name){
         try {
-            const response  = await fetch('http://localhost:8080/api/skills?name='+name);
+            const response  = await fetch('/api/skills?name='+name);
             if(!response.ok){
                 return[];
             }

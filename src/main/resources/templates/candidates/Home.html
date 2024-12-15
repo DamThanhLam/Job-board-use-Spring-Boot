@@ -438,7 +438,7 @@
     }
     async function fetchSkills(name){
         try {
-            const response  = await fetch('http://localhost:8080/api/skills?name='+name);
+            const response  = await fetch('/api/skills?name='+name);
             if(!response.ok){
                 return[];
             }

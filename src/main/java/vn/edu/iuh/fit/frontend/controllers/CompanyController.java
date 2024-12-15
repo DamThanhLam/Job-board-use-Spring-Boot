@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +37,7 @@ import vn.edu.iuh.fit.backend.services.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/company")
@@ -147,11 +149,31 @@ public class CompanyController {
     }
 
     @GetMapping
-    @RequestMapping("/find-candidates")
-    public String findCandidates(@RequestParam("jobId")long jobId, Model model) {
+    @RequestMapping("/find-candidates/list")
+    public String findCandidatesList(@RequestParam("jobId")long jobId, Model model) {
         List<Candidate> candidates = candidateService.findCandidatesByJobIdAndSkills(jobId);
         model.addAttribute("candidates", candidates);
         model.addAttribute("jobId",jobId);
+        return "company/FindCandidatesList";
+    }
+    @GetMapping
+    @RequestMapping("/find-candidates/page")
+    public String findCandidatesPage(@RequestParam("jobId")long jobId, @RequestParam("page") Optional<Integer> page, @RequestParam("size") Optional<Integer> size, Model model) {
+        int pageCurrent = page.orElse(1);
+        int pageSize = size.orElse(10);
+        Page<Candidate> candidates = candidateService.findCandidatesByJobIdAndSkills(jobId, pageCurrent, pageSize,"id","asc");
+        model.addAttribute("candidatePage", candidates);
+        model.addAttribute("jobId",jobId);
+        System.out.println(candidates.getContent().size());
+        int totalPages = candidates.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            model.addAttribute("pageNumbers", pageNumbers);
+        }else{
+            model.addAttribute("pageNumbers", new ArrayList<Integer>().add(1));
+        }
         return "company/FindCandidates";
     }
     @GetMapping

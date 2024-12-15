@@ -36,7 +36,7 @@ C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     </style>
 </head>
 <body>
-<div th:switch="${candidatePage}">
+<div th:switch="${candidates}">
     <h2 th:case="null">No candidates yet!</h2>
     <div th:case="*" style="width: 90%; margin-left: 5%">
         <h2>Candidates</h2>
@@ -55,7 +55,7 @@ C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             </tr>
             </thead>
             <tbody>
-            <tr th:each="candidate: ${candidatePage}">
+            <tr th:each="candidate : ${candidates}">
                 <td th:text="${candidate.id}"></td>
                 <td th:text="${candidate.fullName}"></td>
                 <td th:text="${candidate.dob}"></td>
@@ -72,11 +72,7 @@ C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             </tr>
             </tbody>
         </table>
-        <div class="inline" th:if="${candidatePage.totalPages > 0}" th:each="pageNumber :${pageNumbers}">
-            <a th:href="@{/company/find-candidates/page(size=${candidatePage.size}, page=${pageNumber}, jobId=${jobId})}"
-               th:text="${pageNumber}"
-               th:class="${pageNumber==candidatePage.number + 1} ? active"></a>
-        </div>
+
     </div>
     <div id="container"></div>
 
