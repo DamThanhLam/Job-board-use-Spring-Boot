@@ -17,6 +17,7 @@ public interface CandidateRepository
     Optional<Candidate> findByEmail(String email);
 
     Page<Candidate> findAllByStatus(int i, Pageable pageable);
+
     @Query("SELECT c FROM Candidate c " +
             "JOIN c.candidateSkills cs " +
             "JOIN cs.skill s " +
@@ -24,12 +25,14 @@ public interface CandidateRepository
             "JOIN js.job j " +
             "WHERE j.id = :jobId")
     List<Candidate> findCandidatesByJobIdAndSkills(@Param("jobId") Long jobId);
-    @Query("SELECT DISTINCT c FROM Candidate c " +
+
+    @Query("SELECT c FROM Candidate c " +
             "JOIN c.candidateSkills cs " +
             "JOIN cs.skill s " +
             "JOIN JobSkill js ON js.skill = s " +
             "JOIN js.job j " +
             "WHERE j.id = :jobId")
     Page<Candidate> findCandidatesByJobIdAndSkills(@Param("jobId") Long jobId, Pageable pageable);
+
 
 }

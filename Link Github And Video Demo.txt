@@ -1,0 +1,2 @@
+Github: https://github.com/DamThanhLam/Job-board-use-Spring-Boot.git
+Youtube: https://youtu.be/PPI8OMvrQL4?si=GlAlFzSU5RYqTrFB
