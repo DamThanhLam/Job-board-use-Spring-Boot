@@ -111,52 +111,13 @@ public class SecurityConfig {
     }
 
 
-//    @Bean
-//    public AuthenticationManager authenticationManager(
-//            UserDetailsService userDetailsService,
-//            PasswordEncoder passwordEncoder) {
-//        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-//        authenticationProvider.setUserDetailsService(userDetailsService);
-//        authenticationProvider.setPasswordEncoder(passwordEncoder);
-//
-//        return new ProviderManager(authenticationProvider);
-//    }
-//
-//    /**
-//    * DefaultAuthenticationEventPublisher được sử dụng để phát các sự kiện như:
-//     * AuthenticationSuccessEvent: Khi xác thực thành công.
-//     * AuthenticationFailureEvent: Khi xác thực thất bại.
-//    **/
-    @EventListener
-    public void handleAuthenticationSuccess(AuthenticationSuccessEvent event) {
-        Authentication authentication = event.getAuthentication();
-        OAuth2User principal = (OAuth2User) authentication.getPrincipal();
-        Optional<Candidate> candidate = candidateService.findByEmail(principal.getAttribute("email"));
-        Optional<Company> company = companyService.findByEmail(principal.getAttribute("email"));
-
-        List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authentication.getAuthorities());
-        if (candidate.isPresent()) {
-            updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_CANDIDATE"));
-        } else if (company.isPresent()) {
-            updatedAuthorities.add(new SimpleGrantedAuthority("ROLE_COMPANY"));
-        }
-
-        if (authentication instanceof OAuth2AuthenticationToken) {
-            OAuth2AuthenticationToken oauth2AuthToken = (OAuth2AuthenticationToken) authentication;
-            SecurityContextHolder.getContext().setAuthentication(
-                    new OAuth2AuthenticationToken(
-                            oauth2AuthToken.getPrincipal(),
-                            updatedAuthorities,
-                            oauth2AuthToken.getAuthorizedClientRegistrationId()
-                    )
-            );
-        }
-    }
 
 
+//    Sau khi có token truy cập, Spring Security sử dụng OAuth2UserService để tải thông tin người dùng từ OAuth2 provider
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
         return userRequest -> {
+            System.out.println("oauth2UserService");
             OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
             String email = oAuth2User.getAttribute("email");
             List<GrantedAuthority> authorities = new ArrayList<>(oAuth2User.getAuthorities());

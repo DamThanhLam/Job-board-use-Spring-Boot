@@ -29,7 +29,7 @@ public class RedirectIfLoggedInFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if(auth.isAuthenticated()){
+        if(auth!= null && auth.isAuthenticated()){
             if (request.getRequestURI().equals("/login")|| request.getRequestURI().contains("/login")) {
                 // Người dùng đã đăng nhập, chuyển hướng đến trang chủ
                 response.sendRedirect("/");
@@ -37,18 +37,20 @@ public class RedirectIfLoggedInFilter extends OncePerRequestFilter {
                 OAuth2User user = (OAuth2User) auth.getPrincipal();
                 if(candidateService.findByEmail(user.getAttribute("email")).isPresent()){
                     response.sendRedirect("/candidate");
+                    return;
                 }else if(companyService.findByEmail(user.getAttribute("email")).isPresent()){
                     response.sendRedirect("/company");
+                    return;
                 }else{
                     filterChain.doFilter(request, response);
+                    return;
                 }
             }else {
                 filterChain.doFilter(request, response);  // Tiếp tục lọc các request khác
+                return;
             }
-        }else{
-            response.sendRedirect("/login");
-
         }
+        filterChain.doFilter(request, response);
 
 
     }
